@@ -5,6 +5,7 @@ import { AuthService } from './_services/auth.service';
 import { EventBusService } from './_shared/event-bus.service';
 import Web3 from 'web3';
 import { UserService } from './_services/user.service';
+import {ethers, providers} from "ethers";
 
 @Component({
   selector: 'app-root',
@@ -18,10 +19,12 @@ export class AppComponent {
   showAdminBoard = false;
   showModeratorBoard = false;
   username?: string;
-  private web3: Web3;
+  //private web3: Web3;
   navbarOpen = false;
-
   eventBusSub?: Subscription;
+  public ethereum:any;
+  public metamaskConnected = false;
+  private signer: any;
 
   constructor(
     private storageService: StorageService,
@@ -30,16 +33,17 @@ export class AppComponent {
     private userService:UserService,
   ) {
     const alchemy_url = "https://eth-sepolia.g.alchemy.com/v2/YGNAUM7D8wTvwFUIV8iyRv0i8N6BTT86";
-    this.web3 = new Web3(alchemy_url);
+    //this.web3 = new Web3(alchemy_url);
+    const {ethereum} = <any>window;
+    this.ethereum = ethereum;
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.isLoggedIn = this.storageService.isLoggedIn();
-
     if (this.isLoggedIn) {
       const user = this.storageService.getUser();
       this.roles = user.roles;
-
+      this.metamaskConnected= await this.userService.ethersConnectWallet();
       this.showAdminBoard = this.roles.includes('ROLE_ADMIN');
       this.showModeratorBoard = this.roles.includes('ROLE_MODERATOR');
 
@@ -51,6 +55,7 @@ export class AppComponent {
       this.logout();
     });
   }
+ 
   toggleNavbar() {
     this.navbarOpen = !this.navbarOpen;
   }

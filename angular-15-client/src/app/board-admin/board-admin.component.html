@@ -1,5 +1,20 @@
 <div class="container">
   <header class="jumbotron">
-    <p>{{ content }}</p>
+    <form class="form-group"     
+    name="depositForm"
+    #f="ngForm" 
+    (ngSubmit)="onSubmit()">
+
+      <label for="ethValue">Value:</label>
+      <input type="number" class="ethValue"           
+      [(ngModel)]="depositForm.ethValue"
+      name="ethValue"
+      >    
+      <button class="btn btn-primary btn-block">Deposit here</button>
+    </form>
+    <button class="btn btn-primary btn-block" (click)="deployForwarder(walletId)">Deploy Forwarder</button>
+
+    {{walletId}}
+    {{walletBalance+" eth"}} 
   </header>
 </div>

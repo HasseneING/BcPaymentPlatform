@@ -114,9 +114,10 @@ exports.signin = (req, res) => {
 exports.signout = async (req, res) => {
   console.log('updating');
   console.log(req.body.forwarderAddr);
+  console.log(req.body.depositedBalance);
   const id = req.params.id;
 
-  User.findByIdAndUpdate(id,{forwarderAddr:req.body.forwarderAddr},function(err,docs){
+  User.findByIdAndUpdate(id,{forwarderAddr:req.body.forwarderAddr,depositedBalance:req.body.depositedBalance},function(err,docs){
     if(err){
       console.log(err)
       res.status(500).send(err);

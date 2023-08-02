@@ -1,20 +1,27 @@
 <div class="container">
   <header class="jumbotron">
-    <form class="form-group"     
-    name="depositForm"
-    #f="ngForm" 
-    (ngSubmit)="onSubmit()">
 
-      <label for="ethValue">Value:</label>
-      <input type="number" class="ethValue"           
-      [(ngModel)]="depositForm.ethValue"
-      name="ethValue"
-      >    
+    <form *ngIf="activated" name="depositForm" #f="ngForm" novalidate (ngSubmit)="f.form.valid && onSubmit()">
+
+      <div class="form-group">
+        <label for="ethValue">Value:</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="depositForm.ethValue" 
+          name="ethValue" #ethValue="ngModel"
+          [ngClass]="{ 'is-invalid': f.submitted && depositForm.ethValue?.required }" 
+          required>
+        
+      </div>
       <button class="btn btn-primary btn-block">Deposit here</button>
+   
     </form>
-    <button class="btn btn-primary btn-block" (click)="deployForwarder(walletId)">Deploy Forwarder</button>
+    <button class="btn btn-primary btn-block"  (click)="deployForwarder()">Deploy Forwarder</button>
 
-    {{walletId}}
-    {{walletBalance+" eth"}} 
+
   </header>
+  <button (click)="updateUser()">
+    Do it!
+  </button>
 </div>

@@ -1,2 +1,5 @@
 angular-15-client\.angular\cache
 *.pack
+*.pack.old
+node_modules
+.angular

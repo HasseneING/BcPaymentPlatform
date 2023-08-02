@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import Web3 from 'web3';
+import { ethers } from 'ethers';
 
 const API_URL = 'http://localhost:8080/api/test/';
 const AUTH_API = 'http://localhost:8080/api/auth/';
@@ -140,6 +141,8 @@ export class UserService {
 
   public ethereum;
   private web3;
+  signer: any;
+  metamaskConnected: boolean = false;
   constructor(private http: HttpClient) {
     const {ethereum} = <any>window;
     this.ethereum = ethereum;
@@ -147,7 +150,19 @@ export class UserService {
     var web3Provider = new Web3.providers.HttpProvider(provider);
     this.web3 = new Web3(web3Provider);
   }
+  async ethersConnectWallet(){
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    this.signer = provider.getSigner();
+    this.metamaskConnected=true;
+    console.log(""+ this.metamaskConnected);
+    return this.metamaskConnected;
 
+  }
+  checkWalletConnected() {
+    console.log(this.signer+"providers");
+   // throw new Error('Method not implemented.');
+  }
   public connectWallet = async () => {
     try{
       if(!this.ethereum) return alert("Please install meta mask");
@@ -158,26 +173,23 @@ export class UserService {
     }
   }
 
-  public checkWalletConnected = async () => {
-    try{
-      if(!this.ethereum) return alert("Please install meta mask ")
-      const accounts = await this.ethereum.request({method: 'eth_accounts'});
-      return accounts;
-    }
-    catch(e){
-      throw new Error("No ethereum object found");
-    }
-  }
-
-  update(forwarderAddr: string, id: string): Observable<any> {
+  update(forwarderAddr: string,depositedBalance : string, id: string): Observable<any> {
     console.log('updateing');
     return this.http.put(
       AUTH_API + 'signout/'+id,//this is an update route SOMEHOW
+      {forwarderAddr,depositedBalance},
+      httpOptions
+    );
+  }
+  updateBalance(depositedBalance : string,forwarderAddr:string, id: string) : Observable<any>{
+    console.log("updating Balance");
+    return this.http.put(
+      AUTH_API+'signout/'+id,
       {forwarderAddr},
       httpOptions
     );
   }
-  transactToAddress(from:String,To:String,ethValue:String){
+ async transactToAddress(from:String,To:String,ethValue:String){
     const params = [
       {
         from: from,//this.walletId,

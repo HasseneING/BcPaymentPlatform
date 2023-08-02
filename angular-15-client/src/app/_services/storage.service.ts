@@ -17,7 +17,17 @@ export class StorageService {
     console.log(user);
     window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
   }
+  public updateUser(forwarderAddr:string,depositedBalance:string):any{
+    const user=this.getUser();
+    user.depositedBalance=depositedBalance;
+    user.forwarderAddr=forwarderAddr
+    console.log(user);
+    window.sessionStorage.removeItem(USER_KEY);
+    window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+    console.log(this.getUser()); /* make it look better figure out _id*/
+    window.location.reload();
 
+  }
   public getUser(): any {
     const user = window.sessionStorage.getItem(USER_KEY);
     if (user) {
