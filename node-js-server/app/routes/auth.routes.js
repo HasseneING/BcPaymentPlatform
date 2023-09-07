@@ -22,5 +22,7 @@ module.exports =  function(app) {
 
   app.post("/api/auth/signin", controller.signin);
   app.post("/api/auth/update/", controller.updateUsr);//SIGNOUT
-  app.put("/api/auth/signout/:id", controller.signout);//UPDATE
+  app.put("/api/auth/signout/:id", controller.signout);//UPDATE possiblity to update 
+  app.post("/api/auth/refreshtoken", controller.refreshToken);
+
 };

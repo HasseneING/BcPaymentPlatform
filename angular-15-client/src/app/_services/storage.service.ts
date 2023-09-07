@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 
+
 const USER_KEY = 'auth-user';
 
 @Injectable({
@@ -17,6 +18,9 @@ export class StorageService {
     console.log(user);
     window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
   }
+  public updateUserBalance(){
+
+  }
   public updateUser(forwarderAddr:string,depositedBalance:string):any{
     const user=this.getUser();
     user.depositedBalance=depositedBalance;
@@ -25,7 +29,7 @@ export class StorageService {
     window.sessionStorage.removeItem(USER_KEY);
     window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
     console.log(this.getUser()); /* make it look better figure out _id*/
-    window.location.reload();
+   // window.location.reload();
 
   }
   public getUser(): any {

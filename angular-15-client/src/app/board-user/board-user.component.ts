@@ -8,7 +8,6 @@ import { getForwarderSOL, getWalletSOL } from '../contracts/contractABIs';
 import { from } from 'rxjs';
 const alchemy = require("alchemy-sdk");
 import Swal from 'sweetalert2';
-
 import { Contract, ethers, providers } from "ethers";
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -23,7 +22,6 @@ export class BoardUserComponent implements OnInit {
   depositForm: any = {
     ethValue: null,
   };
-  // private web3: Web3;
   public isSwalVisible: boolean = false;
   public walletConnected: boolean = false;
   public walletId: string = '';
@@ -34,6 +32,7 @@ export class BoardUserComponent implements OnInit {
   private ethersProvider: any;
   public activated: boolean = false;
   public errorMessage: string = '';
+  public depositedAmount: any;
   ethersContract: Contract;
 
   constructor(private userService: UserService, private StorageService: StorageService, private loadingService: LoaderService,
@@ -46,11 +45,8 @@ export class BoardUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
-
     this.checkWalletConnected();
     console.log("check Forwarder here");
-
     this.userService.getUserBoard().subscribe({
       next: data => {
         this.content = data;
@@ -68,15 +64,11 @@ export class BoardUserComponent implements OnInit {
         }
       }
     });
-
     if (this.StorageService.getUser().forwarderAddr === '0x0') {
       this.activated = false;
       console.log(this.activated);
     }
     else this.activated = true;
-
-
-
   }
 
   async checkWalletConnected() {
@@ -90,14 +82,6 @@ export class BoardUserComponent implements OnInit {
     else return false;
 
   }
-  hasForwarder() {
-  }
-  async getWalletId() {//balance?
-    //  let balance2 = await this.web3.eth.getBalance(this.walletId).then(res => { this.walletBalance = res });
-  }
-  async getEvents() {
-    // let events = await this.ethersContract.queryFilter("forwarderCreated" , this.ethersProvider.getBlockNumber)
-  }
   async deployForwarder() {
     this.loadingService.setLoading(true);
     let tx = await this.ethersContract.connect(this.userService.signer).functions['createForwarder']();
@@ -105,81 +89,79 @@ export class BoardUserComponent implements OnInit {
     console.log("done"); // variable changes html for loading
     //console.log("receipt", receipt);
     this.forwarderAddress = ethers.utils.defaultAbiCoder.decode(['address'], receipt.logs[0].data).toString();
-    //console.log(ethers.utils.defaultAbiCoder.decode(['address'], receipt.logs[0].data));
+    console.log(ethers.utils.defaultAbiCoder.decode(['address'], receipt.logs[0].data));
     this.updateForwarder();
-
   }
   updateUser() {
-    const ethValue = this.StorageService.getUser().depositedBalance + 
-    Number(this.depositForm.ethValue);
+    const ethValue = this.StorageService.getUser().depositedBalance +
+      Number(this.depositForm.ethValue);
     console.log(ethValue);
-    
     console.log("update User");
-   /* this.StorageService.updateUser(
-    this.StorageService.getUser().forwarderAddr, 
-    ethValue.toString());*/
+    this.userService.getUserUpdate(this.StorageService.getUser().username).subscribe({
+      next: data => {
+        console.log(data.depositedBalance,"data from getUserUpdatedBalance");
+        this.StorageService.updateUser(data.forwarderAddr,data.depositedBalance);
 
+      },
+      error: err => {
+        console.log(err);
+        
+      }
+    })
   }
   async updateForwarder() {
     let updated = false;
-    //this.deployForwarder(); //if statement here has to be ethersfunc
     console.log('ID' + this.forwarderAddress);
     this.userService.update(this.forwarderAddress, this.StorageService.getUser().depositedBalance, this.StorageService.getUser().id).subscribe({
       next: (data: any) => {
         console.log(data);
         updated = true;
         this.activated = true;
-        this.StorageService.updateUser(this.forwarderAddress,this.StorageService.getUser().depositedBalance);
+        this.StorageService.updateUser(this.forwarderAddress, this.StorageService.getUser().depositedBalance);
         this.loadingService.setLoading(false);
         Swal.fire({
-          title: 'Auto close alert!',
-          html: 'I will close in <b></b> milliseconds.',
-          timer: 2000,
+          title: 'Forwarder Deployed!',
+          html: 'We are Refreshing this page for you!',
+          timer: 5000,
           timerProgressBar: true,
-        }).then(() => { /*window.location.replace('login')*/ });
-
-        /*REGSTIER THE EVENT USING THE FORWARDER ADDRESS FROM HERE*/
+        }).then(() => { this.userService.addTransactionMonitor(this.forwarderAddress) });
       },
       error: (err: { error: { message: any; }; }) => {
-        console.log(err.error.message);
+        // console.log(err.error.message);
+        Swal.fire({
+          icon: 'error',
+          title: 'Something went wrong!',
+          text: err.error.message,
+          footer: '<a href="https://docs.ethers.org/v5/troubleshooting/errors/">Why do I have this issue?</a>'
+        })
       }
     });
     return updated;
   }
+
   async onSubmit(): Promise<void> {
     this.loadingService.setLoading(true);
-    let params = [{
-      from: this.userService.signer.getAddress(),
-      to: this.StorageService.getUser().forwarderAddr.toLowerCase(),
-      value: this.depositForm.ethValue,
-      gasPrice: this.ethersProvider.getGasPrice(),
-      gasLimit: ethers.utils.hexlify(100000),
-      nonce: this.ethersProvider.getTransactionCount(this.userService.signer.address, 'latest')
-    }]
-    console.log("Unist" + ethers.utils.parseUnits(this.depositForm.ethValue.toString(), "ether"));
-
+  
     try {
       let tx = await this.userService.signer.sendTransaction({
         to: this.StorageService.getUser().forwarderAddr,
         value: ethers.utils.parseUnits(this.depositForm.ethValue.toString(), "ether"),
       });
-      //let receipt = await tx.wait();
+      this.loadingService.setLoading(false);
       Swal.fire({
         icon: 'success',
         title: 'Transaction signed!',
         text: 'waiting for transaction to be validated!',
         footer: '<a href="">buy me a coffee?</a>'
       }).then(() => {
-        console.log("done");
+       this.loadingService.setLoading(true);
       })
     }
     catch (err: any) {
-      /*sweet alert2*/
       console.log(err.code);
       console.log(err.message);
       this.loadingService.setLoading(false);
       this.errorMessage = err.code;
-
       Swal.fire({
         icon: 'error',
         title: 'Something went wrong!',
@@ -187,42 +169,6 @@ export class BoardUserComponent implements OnInit {
         footer: '<a href="https://docs.ethers.org/v5/troubleshooting/errors/">Why do I have this issue?</a>'
       })
     }
-    this.loadingService.setLoading(false);
-    this.userService.update(this.StorageService.getUser().forwarderAddr, this.depositForm.ethValue, this.StorageService.getUser().id).subscribe({
-      next: (data: any) => {
-        console.log(data);
-        this.StorageService.updateUser(this.StorageService.getUser().forwarderAddr,this.depositForm.ethValue);
-        /*REGSTIER THE EVENT USING THE FORWARDER ADDRESS FROM HERE*/
-      },
-      error: (err: { error: { message: any; }; }) => {
-        console.log(err.error.message);
-      }
-    });
-
-    // after tx.wait we need to update deposited value if successful 
-    /*From kafka watcher get value if confirmed if failed send error*/
-    /*
-    https://github.com/eventeum/eventeum
-    Provider » Blocks Methods » provider.getBlockWithTransactions
-    kafka
-
-    to update deposited balance we need to check for events on the currentBlock - 5 
-    check if the "from "field is a forwarder (need to store them) 
-    then findby forwarder address and update deposited value 
-    */
-
-    /*
-    TODO:
-      Update Deposited Eth
-      Wait For transaction loading
-      Errors on front-end
-      check wallet connected before payment if not send error 
-      Blockchain listener 
-      how to monitor on chain events
-      eventeum
-      listener on the forwarder addresses to check how much ether has been deposited
-
-    */
 
   }
 }

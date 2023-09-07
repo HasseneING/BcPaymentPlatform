@@ -14,6 +14,9 @@ import { BoardModeratorComponent } from './board-moderator/board-moderator.compo
 import { BoardUserComponent } from './board-user/board-user.component';
 import { httpInterceptorProviders } from './_helpers/http.interceptor';
 import { SpinnerComponent } from './spinner/spinner.component';
+import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
+
+const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
 @NgModule({
   declarations: [
@@ -30,6 +33,7 @@ import { SpinnerComponent } from './spinner/spinner.component';
   imports: [
     BrowserModule,
     AppRoutingModule,SweetAlert2Module.forRoot(),
+    SocketIoModule.forRoot(config),
     FormsModule,
     HttpClientModule,
   ],

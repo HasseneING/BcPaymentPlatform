@@ -4,10 +4,12 @@ import { filter, map } from 'rxjs/operators';
 import { EventData } from './event.class';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class EventBusService {
   private subject$ = new Subject<EventData>();
+
+  constructor() { }
 
   emit(event: EventData) {
     this.subject$.next(event);
