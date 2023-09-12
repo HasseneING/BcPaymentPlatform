@@ -115,7 +115,22 @@ exports.signin = (req, res) => {
     });
 };
 
+exports.userTransfer=async (req, res)=>{
 
+  let username = req.body.username;
+  let totalEth=req.body.balance;
+  console.log("transfer Balance update"+username+"balance: "+totalEth);
+  User.findOneAndUpdate({ username: username }, { depositedBalance: totalEth }, { new: true }, function (error, user) {
+    if (error) {
+      console.log(error);
+    }
+    else {
+        console.log("transfer updated");
+        res.status(200).send();
+         
+    } // done isnt real 
+  })
+}
 exports.userData = (req, res) => {
   console.log('refreshing');
   User.findOne({
@@ -133,6 +148,7 @@ exports.userData = (req, res) => {
       }
 
       res.status(200).send({
+        _id:user.id,
         username: user.username,
         depositedBalance: user.depositedBalance,
         forwarderAddr:user.forwarderAddr,

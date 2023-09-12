@@ -11,11 +11,6 @@ const config = require("./app/config/auth.config");
 
 const app = express();
 const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-io.on('connection', () => {
-  console.log("a user has connected");
- });
-server.listen(3000);
 
 var corsOptions = {
   origin: ["http://localhost:8081"],

@@ -15,11 +15,35 @@
         
       </div>
       <button class="btn btn-primary btn-block">Deposit here</button>
-   
+
     </form>
     <br>
-    <button class="btn btn-primary btn-block"  (click)="deployForwarder()">Deploy Forwarder</button>
+    <button class="btn btn-primary btn-block" *ngIf="!activated" (click)="deployForwarder()">Deploy Forwarder</button>
+    <br><br>
+    
+    <form *ngIf="activated" name="TransferForm" #f="ngForm" novalidate (ngSubmit)="f.form.valid && transferToUser()">
 
+      <div class="form-group">
+        <label for="ethValueTransfer">Value:</label>
+        <input 
+          type="number" 
+          class="form-control" 
+          [(ngModel)]="TransferForm.ethValueTransfer" 
+          name="ethValueTransfer" #ethValueTransfer="ngModel"
+          [ngClass]="{ 'is-invalid': f.submitted && TransferForm.ethValueTransfer?.required }" 
+          required>
+          <label for="User">User:</label>
+          <input 
+            type="String" 
+            class="form-control" 
+            [(ngModel)]="TransferForm.User" 
+            name="User" #User="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && TransferForm.User?.required }" 
+            required>
+        
+      </div>
+      <button class="btn btn-primary btn-block">Transfer To Friend</button>
 
+    </form>
   </header>
 </div>

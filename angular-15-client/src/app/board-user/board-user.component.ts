@@ -22,6 +22,10 @@ export class BoardUserComponent implements OnInit {
   depositForm: any = {
     ethValue: null,
   };
+  TransferForm: any = {
+    ethValueTransfer: null,
+    User: null,
+  };
   public isSwalVisible: boolean = false;
   public walletConnected: boolean = false;
   public walletId: string = '';
@@ -99,13 +103,13 @@ export class BoardUserComponent implements OnInit {
     console.log("update User");
     this.userService.getUserUpdate(this.StorageService.getUser().username).subscribe({
       next: data => {
-        console.log(data.depositedBalance,"data from getUserUpdatedBalance");
-        this.StorageService.updateUser(data.forwarderAddr,data.depositedBalance);
+        console.log(data.depositedBalance, "data from getUserUpdatedBalance");
+        this.StorageService.updateUser(data.forwarderAddr, data.depositedBalance);
 
       },
       error: err => {
         console.log(err);
-        
+
       }
     })
   }
@@ -138,10 +142,51 @@ export class BoardUserComponent implements OnInit {
     });
     return updated;
   }
+  transferToUser() {
+    this.loadingService.setLoading(true);
+    if (parseFloat(this.TransferForm.ethValueTransfer) > parseFloat(this.StorageService.getUser().depositedBalance)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Something went wrong!',
+        text: "Not enough Balance!",
+      })
+    } else {
+      console.log("User: " + this.TransferForm.User);
+      console.log("EthValueTransfer: " + this.TransferForm.ethValueTransfer);
 
+      this.userService.getUserUpdate(this.TransferForm.User).subscribe({
+        next: data => {
+          console.log(data, "data from DataFrom transferUpdateLookupusername");
+          let fullValue = parseFloat(data.depositedBalance) + this.TransferForm.ethValueTransfer;
+          console.log(fullValue + "username" + data.username);
+          this.userService.userTransfer(data.username, fullValue.toString()).subscribe({
+            next: data => {
+              console.log("updateSuccessful" + data);
+              let userNewBalance=parseFloat(this.StorageService.getUser().depositedBalance)-parseFloat(this.TransferForm.ethValueTransfer);
+              this.userService.userTransfer(this.StorageService.getUser().username,userNewBalance.toString()).subscribe({
+                next:data=>{
+                  console.log("updatedOld");
+                  
+                }
+              });
+            }
+          });
+        },
+        error: err => {
+          console.log(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Something went wrong!',
+            text: "User Not Found!",
+          })
+
+        }
+      })
+    }
+  }
   async onSubmit(): Promise<void> {
     this.loadingService.setLoading(true);
-  
+
     try {
       let tx = await this.userService.signer.sendTransaction({
         to: this.StorageService.getUser().forwarderAddr,
@@ -154,7 +199,7 @@ export class BoardUserComponent implements OnInit {
         text: 'waiting for transaction to be validated!',
         footer: '<a href="">buy me a coffee?</a>'
       }).then(() => {
-       this.loadingService.setLoading(true);
+        this.loadingService.setLoading(true);
       })
     }
     catch (err: any) {

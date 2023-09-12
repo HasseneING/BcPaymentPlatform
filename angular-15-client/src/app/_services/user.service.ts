@@ -197,7 +197,7 @@ export class UserService {
     console.log("updating Balance");
     return this.http.put(
       AUTH_API + 'signout/' + id,
-      { forwarderAddr },
+      { depositedBalance },
       httpOptions
     );
   }
@@ -235,6 +235,15 @@ export class UserService {
   }
   getModeratorBoard(): Observable<any> {
     return this.http.get(API_URL + 'mod', { responseType: 'text' });
+  }
+  userTransfer(username:String,balance:String):Observable<any>{
+    console.log("UsernameFromUserTransferPost"+username);
+    
+    const httpOptionsUsr = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json','x-access-token':this.storageService.getUser().accessToken}),
+    };
+    return this.http.post(API_URL+'userTransfer',{username,balance},httpOptionsUsr);
+
   }
   getUserUpdate(username:String ):Observable<any>{
     const httpOptionsUsr = {
