@@ -1,3 +1,5 @@
+/* The AppComponent class is the root component of the Angular application and handles user
+authentication, role-based access control, and updates user information. */
 import { Component } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { StorageService } from './_services/storage.service';
@@ -13,6 +15,9 @@ import { ethers, providers } from "ethers";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
+/* The AppComponent class is responsible for managing the user interface and functionality of the main
+application component, including user authentication, role-based access control, and updating user
+information. */
 export class AppComponent {
   private roles: string[] = [];
   public depositedBalance: any;
@@ -39,7 +44,7 @@ export class AppComponent {
   }
 
   async ngOnInit(): Promise<void> {
-    interval(45000).subscribe(() => { this.updateUser(); })
+    interval(5000).subscribe(() => { this.updateUser(); })
     this.isLoggedIn = this.storageService.isLoggedIn();
     if (this.isLoggedIn) {
       const user = this.storageService.getUser();
@@ -58,6 +63,10 @@ export class AppComponent {
 
 
   }
+ /**
+  * The function `updateUser()` is used to update the user's balance and display a success message if
+  * the balance has been changed.
+  */
   updateUser() {
     this.userService.getUserUpdate(this.storageService.getUser().username).subscribe({
       next: data => {

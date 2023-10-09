@@ -124,18 +124,30 @@ var totalEth = 0;
 const run = async () => {
   // Consuming
   await consumer.connect()
+/* The line `await consumer.subscribe({ topic: 'transaction-events', fromBeginning: false })` is
+subscribing the consumer to the 'transaction-events' topic in the Kafka broker. This means that the
+consumer will start receiving messages from that topic. The `fromBeginning` option is set to
+`false`, which means that the consumer will start consuming messages from the latest offset (i.e.,
+the most recent messages) in the topic. If `fromBeginning` was set to `true`, the consumer would
+start consuming messages from the beginning of the topic. */
   await consumer.subscribe({ topic: 'transaction-events', fromBeginning: false })
 
+ /* The code block you provided is using the `consumer.run()` method from the KafkaJS library to
+ consume messages from the 'transaction-events' topic in the Kafka broker. */
   await consumer.run({
+  /* The `eachMessage` function is a callback function that is executed for each message consumed from
+  the Kafka topic. It receives three parameters: `topic`, `partition`, and `message`. */
     eachMessage: async ({ topic, partition, message }) => {
-      /*console.log({
-        value: JSON.parse(message.value).details.value, // Get eth of user from forwarder address update accordingly goodnight 
-        forwarderAddress: JSON.parse(message.value).details.to
-      })*/
+ 
+   /* This code block is checking if the status of a transaction is 'CONFIRMED'. If it is, it retrieves
+   the amount of ETH transferred and the address of the recipient from the message received from the
+   Kafka topic. */
       if (JSON.parse(message.value).details.status === 'CONFIRMED') {
         let ethAmount = Web3.utils.fromWei(JSON.parse(message.value).details.value, 'ether');
         let forwarderAddress = JSON.parse(message.value).details.to;
-       // console.log(ethAmount);
+    /* This code block is finding a user in the database based on their `forwarderAddr` (forwarder
+    address). Once the user is found, it calculates the new total balance by adding the `ethAmount`
+    (amount of ETH transferred) to the current `depositedBalance` of the user. */
         let usradd = User.findOne({ forwarderAddr: forwarderAddress }).then((docs) => {
           totalEth = parseFloat(docs.depositedBalance) + parseFloat(ethAmount);
         //  console.log("Result :", totalEth); //underfined
@@ -146,14 +158,13 @@ const run = async () => {
               console.log(error);
             }
             else {
-            //  console.log("send socket Deposited Value from here " + user.depositedBalance);
               notifier.notify({
                 title: 'Thank you for Trusting us!',
                 message: 'We recieved your Transfer of '+parseFloat(ethAmount)+' ETH Safely. refresh your page! Your Balance is now  '+user.depositedBalance+'ETH',
                 icon:'C:/Users/HasseneING/Downloads/iconUnchained.png',
                 appID:'Unchained Tax Evasion',
               });
-            } // done isnt real 
+            } 
           })
         })
           .catch((err) => {

@@ -1,3 +1,5 @@
+/* The above class is an Angular service that handles authentication-related functionality such as
+login, registration, token refresh, and logout. */
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders,HttpRequest } from '@angular/common/http';
 import { StorageService } from './storage.service';

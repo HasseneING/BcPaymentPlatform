@@ -2,6 +2,8 @@ const db = require("../models");
 const ROLES = db.ROLES;
 const User = db.user;
 
+/* The `checkDuplicateUsernameOrEmail` function is a middleware function that checks if the username or
+email provided in the request body already exists in the database. */
 checkDuplicateUsernameOrEmail = (req, res, next) => {
   // Username
   User.findOne({
@@ -36,6 +38,8 @@ checkDuplicateUsernameOrEmail = (req, res, next) => {
   });
 };
 
+/* The `checkRolesExisted` function is a middleware function that checks if the roles specified in the
+request body exist in the predefined list of roles (`ROLES`). */
 checkRolesExisted = (req, res, next) => {
   if (req.body.roles) {
     for (let i = 0; i < req.body.roles.length; i++) {

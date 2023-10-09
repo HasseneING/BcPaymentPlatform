@@ -1,3 +1,5 @@
+/* The RegisterComponent class is responsible for handling user registration functionality in an
+Angular application. */
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
 
@@ -23,7 +25,10 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
   }
-//add ForwarderAddress and balance deposited to the thing 
+/**
+ * The onSubmit function handles the form submission for user registration, calling the register method
+ * of the authService and handling the success and error cases.
+ */
   onSubmit(): void {
     const { username, email, password} = this.form;
 

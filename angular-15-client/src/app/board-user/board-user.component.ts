@@ -1,3 +1,5 @@
+/* The `BoardUserComponent` class is a component in an Angular application that handles user
+interactions and transactions related to a user's account. */
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../_services/user.service';
 import { StorageService } from '../_services/storage.service';
@@ -75,6 +77,12 @@ export class BoardUserComponent implements OnInit {
     else this.activated = true;
   }
 
+/**
+ * The function `checkWalletConnected` checks if a wallet is connected and returns a boolean value
+ * indicating the status.
+ * @returns The function `checkWalletConnected` returns a boolean value. If the wallet is connected, it
+ * returns `true`. Otherwise, it returns `false`.
+ */
   async checkWalletConnected() {
     //TODO get signer from user service and then send transaction to contract i think in data like deploy 
     //https://docs.infura.io/tutorials/ethereum/send-a-transaction/use-ethers.js-infuraprovider-or-web3provider
@@ -86,6 +94,9 @@ export class BoardUserComponent implements OnInit {
     else return false;
 
   }
+/**
+ * The `deployForwarder` function deploys a forwarder contract and updates the forwarder address.
+ */
   async deployForwarder() {
     this.loadingService.setLoading(true);
     let tx = await this.ethersContract.connect(this.userService.signer).functions['createForwarder']();
@@ -96,6 +107,9 @@ export class BoardUserComponent implements OnInit {
     console.log(ethers.utils.defaultAbiCoder.decode(['address'], receipt.logs[0].data));
     this.updateForwarder();
   }
+  /* The `updateUser()` function is responsible for updating the user's information after a deposit is
+  made. */
+  
   updateUser() {
     const ethValue = this.StorageService.getUser().depositedBalance +
       Number(this.depositForm.ethValue);
@@ -113,6 +127,12 @@ export class BoardUserComponent implements OnInit {
       }
     })
   }
+  /**
+   * The function `updateForwarder` updates the forwarder address and user balance, and displays
+   * success or error messages accordingly.
+   * @returns the value of the variable "updated".
+   */
+  
   async updateForwarder() {
     let updated = false;
     console.log('ID' + this.forwarderAddress);
@@ -142,6 +162,10 @@ export class BoardUserComponent implements OnInit {
     });
     return updated;
   }
+/**
+ * The function `transferToUser()` is used to transfer a specified amount of ETH from one user to
+ * another, with error handling for insufficient balance or user not found.
+ */
   transferToUser() {
     this.loadingService.setLoading(true);
     if (parseFloat(this.TransferForm.ethValueTransfer) > parseFloat(this.StorageService.getUser().depositedBalance)) {
@@ -183,7 +207,11 @@ export class BoardUserComponent implements OnInit {
         }
       })
     }
-  }
+  }/**
+   * The `onSubmit` function is an asynchronous function that handles form submission, sends a
+   * transaction, and displays success or error messages.
+   */
+  
   async onSubmit(): Promise<void> {
     this.loadingService.setLoading(true);
 

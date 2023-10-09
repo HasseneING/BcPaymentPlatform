@@ -1,3 +1,5 @@
+/* The UserService class is responsible for handling user-related operations such as connecting to a
+wallet, updating user data, performing transactions, and retrieving user information. */
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';

@@ -7,6 +7,8 @@ const { user: User, role: Role, refreshToken: RefreshToken } = db;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
+/* The `exports.signup` function is responsible for handling the signup process for a user. It receives
+the request (`req`) and response (`res`) objects as parameters. */
 exports.signup = (req, res) => {
   const user = new User({
     username: req.body.username,
@@ -63,6 +65,8 @@ exports.signup = (req, res) => {
   });
 };
 
+/* The `exports.signin` function is responsible for handling the signin process for a user. It receives
+the request (`req`) and response (`res`) objects as parameters. */
 exports.signin = (req, res) => {
   console.log('LOGGING');
   User.findOne({
@@ -115,6 +119,8 @@ exports.signin = (req, res) => {
     });
 };
 
+/* The `exports.userTransfer` function is responsible for updating the deposited balance of a user. It
+receives the request (`req`) and response (`res`) objects as parameters. */
 exports.userTransfer=async (req, res)=>{
 
   let username = req.body.username;
@@ -131,6 +137,8 @@ exports.userTransfer=async (req, res)=>{
     } // done isnt real 
   })
 }
+/* The `exports.userData` function is responsible for retrieving the user data from the database and
+sending it as a response. */
 exports.userData = (req, res) => {
   console.log('refreshing');
   User.findOne({
@@ -158,6 +166,8 @@ exports.userData = (req, res) => {
 
 
 
+/* The `exports.signout` function is responsible for updating the `forwarderAddr` field of a user in
+the database. It receives the request (`req`) and response (`res`) objects as parameters. */
 
 exports.signout = async (req, res) => {
   console.log('updating');
@@ -176,6 +186,8 @@ exports.signout = async (req, res) => {
   })
 };
 
+/* The `exports.updateUsr` function is responsible for updating the user session and sending a response
+indicating that the user has been signed out. */
 
 exports.updateUsr = async(req, res) => {
   try {
@@ -189,6 +201,8 @@ exports.updateUsr = async(req, res) => {
 
 
 
+/* The `exports.refreshToken` function is responsible for refreshing the access token of a user. It
+receives the request (`req`) and response (`res`) objects as parameters. */
 
 exports.refreshToken = async (req, res) => {
   const { refreshToken: requestToken } = req.body;
